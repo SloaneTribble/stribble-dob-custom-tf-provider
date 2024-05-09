@@ -15,41 +15,42 @@ import (
 	"github.com/hashicorp/terraform-plugin-framework/types"
 )
 
-// Ensure ScaffoldingProvider satisfies various provider interfaces.
-var _ provider.Provider = &ScaffoldingProvider{}
-var _ provider.ProviderWithFunctions = &ScaffoldingProvider{}
+// Ensure devopsApiProvider satisfies various provider interfaces.
+var _ provider.Provider = &devopsApiProvider{}
+var _ provider.ProviderWithFunctions = &devopsApiProvider{}
 
-// ScaffoldingProvider defines the provider implementation.
-type ScaffoldingProvider struct {
+// devopsApiProvider defines the provider implementation.
+type devopsApiProvider struct {
 	// version is set to the provider version on release, "dev" when the
 	// provider is built and ran locally, and "test" when running acceptance
 	// testing.
 	version string
 }
 
-// ScaffoldingProviderModel describes the provider data model.
-type ScaffoldingProviderModel struct {
-	Endpoint types.String `tfsdk:"endpoint"`
-}
-
-func (p *ScaffoldingProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
-	resp.TypeName = "scaffolding"
+func (p *devopsApiProvider) Metadata(ctx context.Context, req provider.MetadataRequest, resp *provider.MetadataResponse) {
+	resp.TypeName = "devopsApi"
 	resp.Version = p.version
 }
 
-func (p *ScaffoldingProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
+// devopsApiProviderModel maps provider schema data to a Go type.
+type devopsApiProviderModel struct {
+	Endpoint types.String `tfsdk:"endpoint"`
+}
+
+// user defines the endpoint value when declaring this provider in the TF configuration
+func (p *devopsApiProvider) Schema(ctx context.Context, req provider.SchemaRequest, resp *provider.SchemaResponse) {
 	resp.Schema = schema.Schema{
 		Attributes: map[string]schema.Attribute{
 			"endpoint": schema.StringAttribute{
-				MarkdownDescription: "Example provider attribute",
+				MarkdownDescription: "API endpoint",
 				Optional:            true,
 			},
 		},
 	}
 }
 
-func (p *ScaffoldingProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
-	var data ScaffoldingProviderModel
+func (p *devopsApiProvider) Configure(ctx context.Context, req provider.ConfigureRequest, resp *provider.ConfigureResponse) {
+	var data devopsApiProvider
 
 	resp.Diagnostics.Append(req.Config.Get(ctx, &data)...)
 
@@ -66,19 +67,19 @@ func (p *ScaffoldingProvider) Configure(ctx context.Context, req provider.Config
 	resp.ResourceData = client
 }
 
-func (p *ScaffoldingProvider) Resources(ctx context.Context) []func() resource.Resource {
+func (p *devopsApiProvider) Resources(ctx context.Context) []func() resource.Resource {
 	return []func() resource.Resource{
 		NewExampleResource,
 	}
 }
 
-func (p *ScaffoldingProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
+func (p *devopsApiProvider) DataSources(ctx context.Context) []func() datasource.DataSource {
 	return []func() datasource.DataSource{
 		NewExampleDataSource,
 	}
 }
 
-func (p *ScaffoldingProvider) Functions(ctx context.Context) []func() function.Function {
+func (p *devopsApiProvider) Functions(ctx context.Context) []func() function.Function {
 	return []func() function.Function{
 		NewExampleFunction,
 	}
@@ -86,7 +87,7 @@ func (p *ScaffoldingProvider) Functions(ctx context.Context) []func() function.F
 
 func New(version string) func() provider.Provider {
 	return func() provider.Provider {
-		return &ScaffoldingProvider{
+		return &devopsApiProvider{
 			version: version,
 		}
 	}
